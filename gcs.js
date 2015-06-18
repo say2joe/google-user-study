@@ -17,15 +17,29 @@ var SERVICE_ACCOUNT_KEY_FILE = 'GCS-UserStudy-7f6c3a2e0338.json';
 var jwt = new google.auth.JWT(SERVICE_ACCOUNT_EMAIL, SERVICE_ACCOUNT_KEY_FILE, null,
         ['https://www.googleapis.com/auth/devstorage.full_control']);
 
-var createStorageBucket = function() {
-    storage.buckets.insert({
-        project: 'gcs-userstudy',
-        predefinedAcl: oauth2Client
-    });
+var app = {
+
+    bucket: {},
+
+    log: function() {
+        var args = Array.prototype.slice.call(arguments);
+        args.forEach(function(msg){ console.log(msg); });
+    },
+
+    createBucket: function() {
+        var bucket = storage.buckets.insert({
+            project: 'gcs-userstudy',
+            predefinedAcl: oauth2Client
+        });
+        this.bucket = bucket;
+        this.log(bucket);
+    }
+
 };
+
 
 jwt.authorize(function(err, result) {
 	oauth2Client.setCredentials({
 		access_token: result.access_token
-	}, createStorageBucket);
+	}, app.createBucket);
 });
